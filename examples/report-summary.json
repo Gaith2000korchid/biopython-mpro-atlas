@@ -1,0 +1,41 @@
+{
+  "retrieved_at_utc": "2026-09-27T22:37:52.523189+00:00",
+  "profile": {
+    "id": "PS51442",
+    "description": "Coronavirus main protease (M-pro) domain profile.",
+    "primary_record_pdb_count": 0,
+    "aux_release": "2026_03",
+    "aux_pdb_count": 2089,
+    "uniprot_accession_in_aux": true
+  },
+  "uniprot_accession": "P0DTD1",
+  "uniprot_pdb_count": 3363,
+  "shared_pdb_count": 1577,
+  "selected_pdb": "6LU7",
+  "selected_pdb_metadata": {
+    "Method": "X-ray",
+    "Resolution": "2.16 A",
+    "Chains": "A=3264-3569"
+  },
+  "structure": {
+    "pdb_id": "6LU7",
+    "chain_count": 2,
+    "chains": [
+      {
+        "id": "A",
+        "residue_count": 306
+      },
+      {
+        "id": "C",
+        "residue_count": 3
+      }
+    ]
+  },
+  "sources": {
+    "prosite_primary": "https://prosite.expasy.org/PS51442.txt",
+    "prosite_aux": "https://prosite.expasy.org/PS51442.aux",
+    "uniprot": "https://rest.uniprot.org/uniprotkb/P0DTD1.json",
+    "cif": "https://files.rcsb.org/download/6LU7.cif"
+  },
+  "interpretation": "6LU7 chain A has 306 modeled residues; its UniProt chain range 3264-3569 spans 306 positions. An identifier/range agreement, not experimental proof of enzymatic activity."
+}
