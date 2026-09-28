@@ -250,6 +250,7 @@ def build_report(session, accession=DEFAULT_ACCESSION, pdb_id=None, include_stru
                 enriched[pdb] = attached
         domain_rows = [enriched[row["pdb_id"]] for row in domain_rows]
 
+    selected_row = next((row for row in domain_rows if selected and row["pdb_id"] == selected), None)
     report = {
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
         "profile": {"id": PROSITE_ID, "description": primary.description, "primary_record_pdb_count": len(primary.pdb_structs),
@@ -261,6 +262,7 @@ def build_report(session, accession=DEFAULT_ACCESSION, pdb_id=None, include_stru
         "domain_structure_count": len(domain_rows), "unmapped_shared_pdb_count": unmapped,
         "domain_structures": domain_rows, "selected_pdb": selected,
         "selected_pdb_metadata": protein["pdb"].get(selected) if selected else None,
+        "selected_sifts": None if selected_row is None else selected_row.get("sifts"),
         "selected_reason": selected_reason,
         "caveat": "UniProt Chains comparison is an annotation-range test. SIFTS/PDBe segments map PDB polymer ranges to UniProt positions and can report missing domain residues, but they are still segment alignments, not a per-atom experimental proof of activity.",
         "provenance": {
