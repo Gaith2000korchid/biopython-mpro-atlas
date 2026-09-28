@@ -1,5 +1,5 @@
 {
-  "retrieved_at_utc": "2026-09-27T22:37:52.523189+00:00",
+  "retrieved_at_utc": "2026-09-28T00:40:00+00:00",
   "profile": {
     "id": "PS51442",
     "description": "Coronavirus main protease (M-pro) domain profile.",
@@ -11,7 +11,21 @@
   "uniprot_accession": "P0DTD1",
   "uniprot_pdb_count": 3363,
   "shared_pdb_count": 1577,
+  "domain": {
+    "start": 3264,
+    "end": 3569,
+    "source": "uniprot_feature_description",
+    "feature_type": "Chain",
+    "description": "3C-like proteinase nsp5"
+  },
+  "domain_structure_count_any_overlap": 1576,
+  "domain_structure_count_min_coverage_50": 1575,
+  "rejected_examples": [
+    {"pdb_id": "8H7K", "chains": "B=3258-3267", "coverage_pct": 1.31},
+    {"pdb_id": "9EZ6", "chains": "C=6447-6457", "coverage_pct": 0.0}
+  ],
   "selected_pdb": "6LU7",
+  "selected_reason": "user-supplied example; annotated chain A overlaps 3264-3569 at 100%",
   "selected_pdb_metadata": {
     "Method": "X-ray",
     "Resolution": "2.16 A",
@@ -21,15 +35,16 @@
     "pdb_id": "6LU7",
     "chain_count": 2,
     "chains": [
-      {
-        "id": "A",
-        "residue_count": 306
-      },
-      {
-        "id": "C",
-        "residue_count": 3
-      }
+      {"id": "A", "residue_count": 306},
+      {"id": "C", "residue_count": 3}
     ]
+  },
+  "auto_rank_example": {
+    "pdb_id": "9ZNL",
+    "method": "X-ray",
+    "resolution": "1.16 A",
+    "coverage_pct": 100.0,
+    "note": "Highest-coverage then best-resolution shared entry on this date if --pdb is omitted."
   },
   "sources": {
     "prosite_primary": "https://prosite.expasy.org/PS51442.txt",
@@ -37,5 +52,5 @@
     "uniprot": "https://rest.uniprot.org/uniprotkb/P0DTD1.json",
     "cif": "https://files.rcsb.org/download/6LU7.cif"
   },
-  "interpretation": "6LU7 chain A has 306 modeled residues; its UniProt chain range 3264-3569 spans 306 positions. An identifier/range agreement, not experimental proof of enzymatic activity."
+  "interpretation": "6LU7 chain A has 306 modeled residues; its UniProt chain range 3264-3569 spans 306 positions. Identifier intersection left 1577 PDB IDs; residue-range filtering at 50% coverage removed 8H7K and 9EZ6. An annotation agreement, not experimental proof of enzymatic activity."
 }
