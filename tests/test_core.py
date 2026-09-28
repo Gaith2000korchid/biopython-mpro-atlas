@@ -1,3 +1,4 @@
+import json
 import pytest
 from mpro_atlas.core import (
     domain_range_from_uniprot,
@@ -11,6 +12,11 @@ from mpro_atlas.core import (
     parse_resolution_angstrom,
     parse_uniprot,
     build_report,
+)
+from mpro_atlas.mapping import (
+    parse_sifts_uniprot,
+    select_structure,
+    sifts_domain_coverage,
 )
 
 
@@ -135,13 +141,80 @@ HETATM 4 C C1 . N3  C 2 1 ? 6.000 0.000 0.000 1.00 20.00 1 N3  C C1 1
     assert by_id["A"] == 2 and by_id.get("C", 0) == 0
 
 
+def test_sifts_merges_segments_and_reports_missing_domain_residues():
+    payload = {
+        "6lu7": {
+            "UniProt": {
+                "P0DTD1": {
+                    "mappings": [
+                        {
+                            "chain_id": "A",
+                            "unp_start": 3264,
+                            "unp_end": 3400,
+                            "start": {"residue_number": 1, "author_residue_number": 1},
+                            "end": {"residue_number": 137, "author_residue_number": 137},
+                            "identity": 1.0,
+                        },
+                        {
+                            "chain_id": "A",
+                            "unp_start": 3450,
+                            "unp_end": 3569,
+                            "start": {"residue_number": 187, "author_residue_number": 187},
+                            "end": {"residue_number": 306, "author_residue_number": 306},
+                            "identity": 1.0,
+                        },
+                    ]
+                }
+            }
+        }
+    }
+    segments = parse_sifts_uniprot(payload, "6LU7", "P0DTD1")
+    coverage = sifts_domain_coverage(segments, 3264, 3569)
+    assert coverage["overlap_residues"] == 257
+    assert coverage["missing_residues"] == 49
+    assert coverage["missing_ranges"] == [{"start": 3401, "end": 3449}]
+
+
+def test_select_structure_refuses_shared_zero_fallback():
+    protein = {"accession": "P0DTD1", "pdb": {"7LNN": {"Chains": "A=1-932"}, "1LVO": {"Chains": "A=1-10"}}}
+    domain = {"start": 3264, "end": 3569}
+    selected, reason = select_structure(None, protein, domain, [], 50)
+    assert selected is None
+    assert "no PDB structure satisfies" in reason
+
+
 class FakeResponse:
     def __init__(self, text="", data=None):
-        self.text, self.data = text, data
+        self.data = data
+        self.text = text if text else (json.dumps(data) if data is not None else "")
+
     def raise_for_status(self):
         pass
+
     def json(self):
-        return self.data
+        return self.data if self.data is not None else json.loads(self.text)
+
+
+SIFTS_6LU7 = {
+    "6lu7": {
+        "UniProt": {
+            "P0DTD1": {
+                "identifier": "R1AB_SARS2",
+                "mappings": [
+                    {
+                        "entity_id": 1,
+                        "chain_id": "A",
+                        "unp_start": 3264,
+                        "unp_end": 3569,
+                        "start": {"residue_number": 1, "author_residue_number": 1},
+                        "end": {"residue_number": 306, "author_residue_number": 306},
+                        "identity": 1.0,
+                    }
+                ],
+            }
+        }
+    }
+}
 
 
 class FakeSession:
@@ -162,7 +235,16 @@ class FakeSession:
                     {"database": "PDB", "id": "9ZZZ", "properties": [{"key": "Chains", "value": "A=3264-3569"}]},
                 ],
             })
+        if "/mappings/uniprot/" in url:
+            return FakeResponse(data=SIFTS_6LU7)
         raise AssertionError(url)
+
+
+class OnlyPolymeraseSession(FakeSession):
+    def get(self, url, timeout):
+        if url.endswith(".aux"):
+            return FakeResponse("AC   PS51442;\nDR   P0DTD1    , R1AB_SARS2 , T;\n3D   7LNN;\n")
+        return super().get(url, timeout)
 
 
 def test_build_report_offline_filters_to_domain_and_rejects_nonoverlapping_choice():
@@ -170,8 +252,26 @@ def test_build_report_offline_filters_to_domain_and_rejects_nonoverlapping_choic
     assert report["shared_pdb_ids"] == ["6LU7", "7LNN"]
     assert report["selected_pdb"] == "6LU7"
     assert report["domain_structure_count"] == 1
+    assert report["coverage_tiers"] == {"any_overlap": 1, "min_50": 1, "min_95": 1}
+    assert report["min_coverage"] == 50.0
     assert "7LNN" not in table and "6LU7" in table
-    with pytest.raises(ValueError, match="does not overlap"):
+    assert report["domain_structures"][0]["sifts"]["coverage_pct"] == 100.0
+    assert report["domain_structures"][0]["sifts"]["missing_residues"] == 0
+    assert report["selected_sifts"]["coverage_pct"] == 100.0
+    assert report["provenance"]["mpro_atlas_version"] == "0.3.0"
+    assert report["sources"]["pdbe_sifts"]
+    with pytest.raises(ValueError, match="does not meet min_coverage"):
         build_report(FakeSession(), pdb_id="7LNN", include_structure=False)
     with pytest.raises(ValueError, match="not cross-referenced"):
         build_report(FakeSession(), pdb_id="1LVO", include_structure=False)
+
+
+def test_build_report_can_skip_sifts_and_does_not_pick_shared_zero():
+    report, _, _ = build_report(FakeSession(), include_structure=False, include_sifts=False)
+    assert "pdbe_sifts" not in report["sources"]
+    assert "sifts" not in report["domain_structures"][0]
+    empty, _, _ = build_report(OnlyPolymeraseSession(), include_structure=False, include_sifts=False)
+    assert empty["shared_pdb_ids"] == ["7LNN"]
+    assert empty["selected_pdb"] is None
+    assert empty["domain_structure_count"] == 0
+    assert "no PDB structure satisfies" in empty["selected_reason"]
