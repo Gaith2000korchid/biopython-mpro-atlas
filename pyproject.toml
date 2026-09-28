@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "biopython-mpro-atlas"
-version = "0.2.0"
-description = "Trace coronavirus M-pro profiles to UniProtKB and keep PDB structures whose chains overlap the domain"
+version = "0.3.0"
+description = "Trace coronavirus M-pro to UniProt/PDB and validate domain coverage with SIFTS"
 requires-python = ">=3.10"
 dependencies = ["biopython>=1.81,<2", "requests>=2.31,<3"]
 
