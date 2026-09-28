@@ -11,6 +11,12 @@
   "uniprot_accession": "P0DTD1",
   "uniprot_pdb_count": 3363,
   "shared_pdb_count": 1577,
+  "min_coverage": 50.0,
+  "coverage_tiers": {
+    "any_overlap": 1576,
+    "min_50": 1575,
+    "min_95": 1575
+  },
   "domain": {
     "start": 3264,
     "end": 3569,
@@ -31,6 +37,13 @@
     "Resolution": "2.16 A",
     "Chains": "A=3264-3569"
   },
+  "selected_sifts": {
+    "mapping_source": "pdbe_sifts_uniprot",
+    "overlap_residues": 306,
+    "coverage_pct": 100.0,
+    "missing_residues": 0,
+    "note": "PDBe maps chain A unp 3264-3569 to PDB residues 1-306."
+  },
   "structure": {
     "pdb_id": "6LU7",
     "chain_count": 2,
@@ -50,7 +63,8 @@
     "prosite_primary": "https://prosite.expasy.org/PS51442.txt",
     "prosite_aux": "https://prosite.expasy.org/PS51442.aux",
     "uniprot": "https://rest.uniprot.org/uniprotkb/P0DTD1.json",
+    "pdbe_sifts": ["https://www.ebi.ac.uk/pdbe/api/mappings/uniprot/6lu7"],
     "cif": "https://files.rcsb.org/download/6LU7.cif"
   },
-  "interpretation": "6LU7 chain A has 306 modeled residues; its UniProt chain range 3264-3569 spans 306 positions. Identifier intersection left 1577 PDB IDs; residue-range filtering at 50% coverage removed 8H7K and 9EZ6. An annotation agreement, not experimental proof of enzymatic activity."
+  "interpretation": "6LU7 chain A has 306 modeled residues; UniProt and SIFTS both place the domain on 3264-3569. Identifier intersection left 1577 PDB IDs; the 50% residue-range filter removed 8H7K and 9EZ6. An annotation and segment agreement, not experimental proof of enzymatic activity."
 }
