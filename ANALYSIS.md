@@ -4,9 +4,9 @@
 
 The Coursera notebook called `ExPASy.get_prosite_raw('PS51442')`, parsed it with Biopython and obtained `record.pdb_structs == []`. The hypothesis that all PDB associations had disappeared can be tested against the PROSITE format documentation and the entry's auxiliary file.
 
-We parsed `PS51442.txt` with `Bio.ExPASy.Prosite`, extracted the `3D` and `DR` lines of `PS51442.aux`, fetched **one** UniProtKB entry (`P0DTD1`), compared the accession's PDB cross-references with the profile's PDB list, then retrieved `6LU7.cif` for an example structure. The report keeps source URLs and retrieval time.
+We parsed `PS51442.txt` with `Bio.ExPASy.Prosite`, extracted the `3D` and `DR` lines of `PS51442.aux`, fetched **one** UniProtKB entry (`P0DTD1`), located the nsp5 / M-pro interval on that polyprotein, compared each shared PDB `Chains` annotation with that interval, then retrieved `6LU7.cif` for an example structure. The report keeps source URLs and retrieval time.
 
-## Observation from 27 September 2026 UTC
+## Observation from 28 September 2026 UTC
 
 | Evidence | Result | Scope |
 | --- | ---: | --- |
@@ -14,10 +14,16 @@ We parsed `PS51442.txt` with `Bio.ExPASy.Prosite`, extracted the `3D` and `DR` l
 | `PS51442.aux` / `3D` identifiers | 2,089 | Entire profile, many coronavirus proteins |
 | UniProtKB `P0DTD1` / PDB cross-references | 3,363 | Entire SARS-CoV-2 replicase polyprotein 1ab |
 | IDs shared by the two lists | 1,577 | Identifier overlap, not verified chain coverage |
+| UniProt feature used as M-pro interval | 3264–3569 | Chain "3C-like proteinase nsp5" |
+| Shared IDs whose `Chains` overlap that interval | 1,576 | Any positive overlap |
+| Shared IDs with ≥50% domain coverage | 1,575 | Annotation-level filter |
+| Shared IDs rejected at 50% coverage | 2 | `8H7K` (B=3258–3267, 1.3%); `9EZ6` (C=6447–6457, 0%) |
 | `6LU7` UniProt chain annotation | A=3264–3569 | Entry's position range |
 | `6LU7` mmCIF parsed by Biopython | Chain A: 306 modeled residues; chain C: 3 | Observed residue counts |
 
-The range 3264–3569 has 306 positions, consistent with chain A's residue count. These counts are time sensitive, and the accession covers an entire polyprotein: **a UniProt PDB cross-reference alone is not a claim that every PDB entry covers M-pro**. A residue-level mapping should precede any large-scale structural analysis. The 2,089 profile entries must not be mislabeled "the PDB structures of P0DTD1".
+The range 3264–3569 has 306 positions, consistent with chain A's residue count. These counts are time sensitive. The 2,089 profile entries must not be mislabeled "the PDB structures of P0DTD1". The 1,577 shared IDs must not be reported as 1,577 independent proofs of M-pro coverage: two of them fail a simple range test.
+
+On this accession and this PROSITE profile, identifier intersection already removes most non-nsp5 structures of `P0DTD1`. The residue-range step is still required. It converts an implicit assumption into a stated predicate, ranks remaining entries by coverage and resolution, and exposes the exceptions.
 
 ## Interpretation
 
@@ -25,6 +31,8 @@ The [PROSITE user manual](https://prosite.expasy.org/prosuser.html) documents th
 
 The original notebook's broad UniProt `/search` request also yielded a list without checking subsequent pages. UniProt documents a default page size of 25 and a maximum size of 500. This project uses an exact accession instead, so its analysis has a defined biological unit.
 
+UniProt `Chains` coordinates are annotations, not a SIFTS alignment. Agreement between 3264–3569 and 306 modeled residues in `6LU7` chain A is consistent numbering, not a new experimental result.
+
 ## Next biological questions
 
-Map individual PDB polymer entities to the M-pro region and inspect sequence identity, coverage, method, resolution and ligands. A genuine ScanProsite result, BLAST comparison, PubMed literature selection and KEGG annotation can then be added as **distinct evidence**, each with its own input, uncertainty and provenance.
+Replace UniProt range comparison with SIFTS / PDBe residue mapping when a claim needs author-to-UniProt coordinate identity. Inspect ligands and mutations on the filtered table. A genuine ScanProsite result, BLAST comparison, PubMed literature selection and KEGG annotation can then be added as **distinct evidence**, each with its own input, uncertainty and provenance.
