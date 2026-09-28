@@ -1,1 +1,1 @@
-"""Trace a PROSITE profile to UniProtKB and PDB structures."""
+"""Trace a PROSITE profile to UniProtKB and filter PDB structures that overlap M-pro."""
