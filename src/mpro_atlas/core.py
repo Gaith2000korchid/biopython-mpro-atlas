@@ -96,3 +96,73 @@ def parse_aux(text: str) -> dict[str, Any]:
         "pdb_ids": sorted(pdb_ids),
         "uniprot_accessions": sorted(matches),
     }
+
+
+def _feature_span(feature: dict[str, Any]) -> tuple[int, int] | None:
+    location = feature.get("location") or {}
+    start = (location.get("start") or {}).get("value")
+    end = (location.get("end") or {}).get("value")
+    if start is None or end is None:
+        return None
+    start_i, end_i = int(start), int(end)
+    if start_i > end_i:
+        start_i, end_i = end_i, start_i
+    return start_i, end_i
+
+
+def domain_range_from_uniprot(entry: dict[str, Any], prosite_id: str = PROSITE_ID) -> dict[str, Any] | None:
+    """Locate the M-pro interval on a UniProt entry from features, not from PDB lists."""
+    for feature in entry.get("features") or []:
+        for ref in feature.get("featureCrossReferences") or []:
+            if ref.get("database") == "PROSITE" and ref.get("id") == prosite_id:
+                span = _feature_span(feature)
+                if span:
+                    return {
+                        "start": span[0],
+                        "end": span[1],
+                        "source": "uniprot_feature_prosite",
+                        "feature_type": feature.get("type"),
+                        "description": feature.get("description"),
+                    }
+    for feature in entry.get("features") or []:
+        description = (feature.get("description") or "").lower()
+        if any(keyword in description for keyword in _DOMAIN_KEYWORDS):
+            span = _feature_span(feature)
+            if span:
+                return {
+                    "start": span[0],
+                    "end": span[1],
+                    "source": "uniprot_feature_description",
+                    "feature_type": feature.get("type"),
+                    "description": feature.get("description"),
+                }
+    return None
+
+
+def parse_chain_ranges(chains_value: str | None) -> list[dict[str, Any]]:
+    """Parse UniProt PDB 'Chains' annotations such as 'A=3264-3569' or 'A/B=3264-3569'."""
+    if not chains_value:
+        return []
+    assignments: list[dict[str, Any]] = []
+    for match in _CHAIN_ASSIGNMENT.finditer(chains_value):
+        start, end = int(match.group(2)), int(match.group(3))
+        if start > end:
+            start, end = end, start
+        for chain_id in match.group(1).split("/"):
+            chain_id = chain_id.strip()
+            if chain_id:
+                assignments.append({"chain": chain_id, "start": start, "end": end})
+    return assignments
+
+
+def inclusive_overlap(start_a: int, end_a: int, start_b: int, end_b: int) -> int:
+    start = max(start_a, start_b)
+    end = min(end_a, end_b)
+    return max(0, end - start + 1)
+
+
+def parse_resolution_angstrom(value: str | None) -> float | None:
+    if not value:
+        return None
+    match = re.search(r"(\d+(?:\.\d+)?)", value)
+    return float(match.group(1)) if match else None
