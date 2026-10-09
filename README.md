@@ -14,6 +14,27 @@ An independently built, reproducible bioinformatics case study inspired by Cours
 
 Identifier overlap is still not enough. `P0DTD1` is the SARS-CoV-2 replicase polyprotein 1ab. A PDB cross-reference on that accession may cover nsp5 / M-pro or another region. Version 0.2 parses UniProt `Chains` annotations and compares them with the M-pro interval. Version 0.3 raises the default coverage threshold to 50%, refuses to fall back to an unfiltered shared PDB ID, and maps the selected structure through PDBe SIFTS segments.
 
+## Start here
+
+**Contribution:** a Python CLI that joins PROSITE, UniProtKB, PDB and SIFTS, filters structures by domain coverage, and records sources for offline replay.
+
+**Recorded example:** on 9 October 2026, the selected structure `6LU7` maps the 306-residue UniProt domain to PDB chain A residues 1–306. Segment coverage describes annotation correspondence, not experimental activity or per-atom occupancy.
+
+| Recorded output | Value |
+|---|---|
+| Selected PDB | 6LU7 |
+| UniProt interval | 3264–3569 |
+| SIFTS overlap | 306 residues |
+| SIFTS segment coverage | 100% |
+
+**Demo entry point** (after [installation](#reproduce), from the repository root; contacts live databases and needs a new output directory):
+
+```bash
+mpro-atlas --accession P0DTD1 --pdb 6LU7 --out results/profile-demo
+```
+
+[Dated output and source fingerprints](examples/report-summary-2026-10-09.json) · [Offline replay](examples/README.md) · [Interpretation limits](#known-limits)
+
 ## Reproduce
 
 ```bash
