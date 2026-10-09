@@ -5,3 +5,8 @@ __pycache__/
 *.egg-info/
 results/
 .ipynb_checkpoints/
+.env
+.env.*
+!.env.example
+*.pem
+*.key

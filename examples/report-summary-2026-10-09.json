@@ -1,0 +1,115 @@
+{
+  "retrieved_at_utc": "2026-10-09T11:23:55.373318+00:00",
+  "retrieval_mode": "live_recorded",
+  "profile": {
+    "id": "PS51442",
+    "description": "Coronavirus main protease (M-pro) domain profile.",
+    "primary_record_pdb_count": 0,
+    "aux_release": "2026_03",
+    "aux_pdb_count": 2089,
+    "uniprot_accession_in_aux": true
+  },
+  "domain": {
+    "start": 3264,
+    "end": 3569,
+    "source": "uniprot_feature_description",
+    "feature_type": "Chain",
+    "description": "3C-like proteinase nsp5"
+  },
+  "min_coverage": 50.0,
+  "coverage_tiers": {
+    "any_overlap": 1576,
+    "min_50": 1575,
+    "min_95": 1570
+  },
+  "shared_pdb_count": 1577,
+  "domain_structure_count": 1575,
+  "selected_pdb": "6LU7",
+  "selected_pdb_metadata": {
+    "Method": "X-ray",
+    "Resolution": "2.16 A",
+    "Chains": "A=3264-3569"
+  },
+  "selected_sifts": {
+    "segments": [
+      {
+        "chain_id": "A",
+        "unp_start": 3264,
+        "unp_end": 3569,
+        "pdb_start": 1,
+        "pdb_end": 306,
+        "author_start": 1,
+        "author_end": 306,
+        "identity": 1.0
+      }
+    ],
+    "overlap_residues": 306,
+    "coverage_pct": 100.0,
+    "missing_residues": 0,
+    "missing_ranges": [],
+    "mapping_source": "pdbe_sifts_uniprot"
+  },
+  "structure": {
+    "pdb_id": "6LU7",
+    "chain_count": 2,
+    "chains": [
+      {
+        "id": "A",
+        "residue_count": 306
+      },
+      {
+        "id": "C",
+        "residue_count": 3
+      }
+    ]
+  },
+  "provenance": {
+    "mpro_atlas_version": "0.3.1",
+    "biopython_version": "1.88",
+    "prosite_release": "2026_03",
+    "prosite_primary_sha256": "1ce908df7cd9cc6d079b2259e151b5a5c0c3f925a0cdc563e8d04fec686120cf",
+    "prosite_aux_sha256": "9c8e7ca317df9551f6a93066052760761baf2274cca05e7cf49d99b0e1cc4b32",
+    "uniprot_sha256": "7366d4fea701dfccea0226cbe43850961d5192cad95d0e7644cc0c16dec7e642"
+  },
+  "sources": {
+    "prosite_primary": "https://prosite.expasy.org/PS51442.txt",
+    "prosite_aux": "https://prosite.expasy.org/PS51442.aux",
+    "uniprot": "https://rest.uniprot.org/uniprotkb/P0DTD1.json",
+    "pdbe_sifts": [
+      "https://www.ebi.ac.uk/pdbe/api/mappings/uniprot/6lu7"
+    ],
+    "cif": "https://files.rcsb.org/download/6LU7.cif"
+  },
+  "caveat": "UniProt Chains comparison is an annotation-range test. SIFTS/PDBe segments map PDB polymer ranges to UniProt positions and can report missing domain residues, but they are still segment alignments, not a per-atom experimental proof of activity.",
+  "snapshot_manifest": {
+    "encoding": "utf-8",
+    "format_version": 1,
+    "sources": {
+      "https://files.rcsb.org/download/6LU7.cif": {
+        "file": "1b36917a57e7b81a0b9aaf40b266f8e848a0ccd86e84c55ac499abaf1082e1f2.txt",
+        "retrieved_at_utc": "2026-10-09T11:24:00.281969+00:00",
+        "sha256": "1496edb125c5460e6b9530e65e7007d74631dbfb43950aa46109db2ca3d67d2a"
+      },
+      "https://prosite.expasy.org/PS51442.aux": {
+        "file": "c487b180b0ce8da24ed8568e93ae01954467ee17b3a66a6eb13b6cdc5a8e5e04.txt",
+        "retrieved_at_utc": "2026-10-09T11:23:43.576402+00:00",
+        "sha256": "9c8e7ca317df9551f6a93066052760761baf2274cca05e7cf49d99b0e1cc4b32"
+      },
+      "https://prosite.expasy.org/PS51442.txt": {
+        "file": "546ea9bccf322f6b684ed34dc5ca757ed01500981fb420c79856139d310dff12.txt",
+        "retrieved_at_utc": "2026-10-09T11:23:43.234327+00:00",
+        "sha256": "1ce908df7cd9cc6d079b2259e151b5a5c0c3f925a0cdc563e8d04fec686120cf"
+      },
+      "https://rest.uniprot.org/uniprotkb/P0DTD1.json": {
+        "file": "c0e54a62ed0e5004f3b928a99af15644b2e6ad85b663ea1754481ee9ae633fee.txt",
+        "retrieved_at_utc": "2026-10-09T11:23:49.479332+00:00",
+        "sha256": "7366d4fea701dfccea0226cbe43850961d5192cad95d0e7644cc0c16dec7e642"
+      },
+      "https://www.ebi.ac.uk/pdbe/api/mappings/uniprot/6lu7": {
+        "file": "717c31261a21a29a91b423c185d257c6e0d3a3ae73675220bc899610aac4cf52.txt",
+        "retrieved_at_utc": "2026-10-09T11:23:55.372030+00:00",
+        "sha256": "f6f495b85b0dde3ce69f5356062406fd2888c42e2ca71ff80e5acc19e16e6410"
+      }
+    }
+  }
+}

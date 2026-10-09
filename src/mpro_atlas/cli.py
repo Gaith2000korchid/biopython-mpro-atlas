@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from Bio import SeqIO
 from .core import DEFAULT_ACCESSION, DEFAULT_MIN_COVERAGE, build_report, session_with_retries
+from .snapshots import RecordingSession, ReplaySession
 
 
 def main() -> None:
@@ -28,9 +29,13 @@ def main() -> None:
         help="Max number of PDB entries to enrich with SIFTS (default: 1, the selected structure)",
     )
     parser.add_argument("--out", type=Path, default=Path("results"))
+    parser.add_argument("--offline-sources", type=Path,
+                        help="Replay a recorded sources directory without network access")
     args = parser.parse_args()
+    session = (ReplaySession(args.offline_sources) if args.offline_sources else
+               RecordingSession(session_with_retries(), args.out / "sources"))
     report, fasta, table = build_report(
-        session_with_retries(),
+        session,
         args.accession,
         args.pdb,
         not args.skip_structure,

@@ -36,7 +36,7 @@ PROSITE_ID = "PS51442"
 DEFAULT_ACCESSION = "P0DTD1"
 DEFAULT_DOMAIN_RANGES = {DEFAULT_ACCESSION: (3264, 3569)}
 DEFAULT_MIN_COVERAGE = 50.0
-PACKAGE_VERSION = "0.3.0"
+PACKAGE_VERSION = "0.3.1"
 BASES = {
     "prosite": "https://prosite.expasy.org",
     "uniprot": "https://rest.uniprot.org/uniprotkb",
@@ -236,10 +236,10 @@ def build_report(session, accession=DEFAULT_ACCESSION, pdb_id=None, include_stru
         if selected:
             targets.append(selected)
         for row in domain_rows:
-            if row["pdb_id"] not in targets:
-                targets.append(row["pdb_id"])
             if len(targets) >= sifts_limit:
                 break
+            if row["pdb_id"] not in targets:
+                targets.append(row["pdb_id"])
         enriched = {row["pdb_id"]: row for row in domain_rows}
         for pdb in targets:
             payload, url = fetch_sifts(session, pdb, BASES["pdbe"])
@@ -253,6 +253,7 @@ def build_report(session, accession=DEFAULT_ACCESSION, pdb_id=None, include_stru
     selected_row = next((row for row in domain_rows if selected and row["pdb_id"] == selected), None)
     report = {
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
+        "retrieval_mode": getattr(session, "retrieval_mode", "live"),
         "profile": {"id": PROSITE_ID, "description": primary.description, "primary_record_pdb_count": len(primary.pdb_structs),
                     "aux_release": aux["release"], "aux_pdb_count": len(aux["pdb_ids"]),
                     "uniprot_accession_in_aux": accession in aux["uniprot_accessions"]},

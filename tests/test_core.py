@@ -247,6 +247,35 @@ class OnlyPolymeraseSession(FakeSession):
         return super().get(url, timeout)
 
 
+class MultipleStructuresSession(FakeSession):
+    def __init__(self):
+        self.sifts_requests = []
+
+    def get(self, url, timeout):
+        if "/mappings/uniprot/" in url:
+            self.sifts_requests.append(url.rsplit("/", 1)[-1])
+        response = super().get(url, timeout)
+        if url.endswith(".json"):
+            response.data["uniProtKBCrossReferences"].append({
+                "database": "PDB", "id": "1ABC", "properties": [
+                    {"key": "Chains", "value": "A=3264-3569"},
+                    {"key": "Resolution", "value": "1.0 A"},
+                ],
+            })
+            response.text = json.dumps(response.data)
+        if url.endswith(".aux"):
+            response.text += "3D   1ABC;\n"
+        return response
+
+
+@pytest.mark.parametrize("limit,expected", [(0, []), (1, ["6lu7"]),
+                                          (2, ["6lu7", "1abc"])])
+def test_sifts_limit_includes_user_selected_structure(limit, expected):
+    session = MultipleStructuresSession()
+    build_report(session, pdb_id="6LU7", include_structure=False, sifts_limit=limit)
+    assert session.sifts_requests == expected
+
+
 def test_build_report_offline_filters_to_domain_and_rejects_nonoverlapping_choice():
     report, fasta, table = build_report(FakeSession(), include_structure=False)
     assert report["shared_pdb_ids"] == ["6LU7", "7LNN"]
@@ -258,7 +287,7 @@ def test_build_report_offline_filters_to_domain_and_rejects_nonoverlapping_choic
     assert report["domain_structures"][0]["sifts"]["coverage_pct"] == 100.0
     assert report["domain_structures"][0]["sifts"]["missing_residues"] == 0
     assert report["selected_sifts"]["coverage_pct"] == 100.0
-    assert report["provenance"]["mpro_atlas_version"] == "0.3.0"
+    assert report["provenance"]["mpro_atlas_version"] == "0.3.1"
     assert report["sources"]["pdbe_sifts"]
     with pytest.raises(ValueError, match="does not meet min_coverage"):
         build_report(FakeSession(), pdb_id="7LNN", include_structure=False)

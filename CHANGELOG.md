@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 — 2026-10-09
+
+- Respect `sifts_limit` when the user-selected structure is not first in the ranking.
+- Record successful source responses with URL/time/SHA-256 manifests and replay them offline with integrity checks.
+- Add a dated live run and a compact archive of its source payloads; preserve the historical 0.3.0 summary.
+- Add hashed dependency locks and regression tests; scientific selection rules remain unchanged.
+
 ## 0.3.0 — 2026-09-28
 
 Stable snapshot of the PS51442 / P0DTD1 case study.

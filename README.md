@@ -1,12 +1,14 @@
 # Coronavirus M-pro: from PROSITE profile to protein structures
 
 [![CI](https://github.com/Gaith2000korchid/biopython-mpro-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/Gaith2000korchid/biopython-mpro-atlas/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.3.0-blue)](https://github.com/Gaith2000korchid/biopython-mpro-atlas)
+[![Version](https://img.shields.io/badge/version-0.3.1-blue)](https://github.com/Gaith2000korchid/biopython-mpro-atlas)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An independently built, reproducible bioinformatics case study inspired by Coursera's **Access Bioinformatics Databases with Biopython** Guided Project. It investigates why `Bio.ExPASy.Prosite.read(...).pdb_structs` returns `[]` for `PS51442` even though experimental structures exist, then keeps only the PDB entries whose UniProt chain coordinates cover at least 50% of the M-pro interval, and optionally checks the selected structure with PDBe/SIFTS.
 
-**Status:** `v0.3.0` on `main` is the stable snapshot of this case study. CI is green on Python 3.10 and 3.12. Later work (occupancy audits, ScanProsite, BLAST, KEGG) belongs in a new version, not in silent edits to this baseline.
+**Status:** `v0.3.1` fixes a SIFTS request-limit bug and adds source snapshots with offline replay. The historical `v0.3.0` scientific baseline and dated September summary remain documented. CI tests Python 3.10 and 3.12. Occupancy audits, ScanProsite, BLAST and KEGG remain future work.
+
+[Présentation française](docs/PRESENTATION_FR.md) · [Recorded sources and offline replay](examples/README.md)
 
 **Finding:** `PS51442` is the *coronavirus main protease (M-pro)* profile. Since PROSITE release 2024_03, `3D` structure references reside in the separate `PROSITE.AUX` entry (`PS51442.aux`), while the regular `PS51442.txt` record contains the profile definition. An empty `pdb_structs` on the regular record is therefore a record-format issue, not evidence that the protein has no PDB structures. See [PROSITE record](https://prosite.expasy.org/PS51442), [auxiliary record](https://prosite.expasy.org/PS51442.aux), and [PROSITE user manual](https://prosite.expasy.org/prosuser.html).
 
@@ -17,12 +19,13 @@ Identifier overlap is still not enough. `P0DTD1` is the SARS-CoV-2 replicase pol
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .\.venv\Scripts\Activate.ps1
-python -m pip install -e '.[test]'
+python -m pip install --require-hashes -r requirements.lock
+python -m pip install --no-deps -e .
 python -m pytest -q
-mpro-atlas --accession P0DTD1 --pdb 6LU7 --out results
+mpro-atlas --accession P0DTD1 --pdb 6LU7 --out results/live-run
 ```
 
-The command contacts the live PROSITE, UniProtKB, PDBe and RCSB PDB services. It creates `results/report.json`, `results/domain_structures.csv` and `results/protein.fasta`; generated outputs are excluded from git because external databases change. `--skip-structure` skips the mmCIF download; `--skip-sifts` skips PDBe mapping; `--sifts-limit` controls how many passing PDB IDs are enriched. `--pdb 6LU7` requests a specific PDB ID **provided UniProt currently cross-references it and the annotated chains meet `--min-coverage` on the M-pro interval**. The default `--min-coverage` is 50. If no structure meets that threshold, the report leaves `selected_pdb` empty instead of picking `shared[0]`. Use `--domain-start` / `--domain-end` to override the interval. Network access is needed only for the command, not for tests.
+The command contacts the live PROSITE, UniProtKB, PDBe and RCSB PDB services. It creates `<out>/report.json`, `<out>/domain_structures.csv` and `<out>/protein.fasta`; generated outputs are excluded from git because external databases change. Successful source responses are also saved as UTF-8 decoded payloads in `<out>/sources/`, with a URL/time/hash manifest. A live run refuses to replace an existing source manifest; use a new output directory. `--offline-sources DIR` replays a recorded snapshot, validates its checksums and makes no network requests. The report marks offline retrieval explicitly; its current replay time is not a new database retrieval date. `--skip-structure` skips the mmCIF download; `--skip-sifts` skips PDBe mapping; `--sifts-limit` controls how many passing PDB IDs are enriched. `--pdb 6LU7` requests a specific PDB ID **provided UniProt currently cross-references it and the annotated chains meet `--min-coverage` on the M-pro interval**. The default `--min-coverage` is 50. If no structure meets that threshold, the report leaves `selected_pdb` empty instead of picking `shared[0]`. Use `--domain-start` / `--domain-end` to override the interval. Network access is needed only for live commands; tests and snapshot replay run offline.
 
 The checked-in [`examples/report-summary.json`](examples/report-summary.json) records a run on 28 September 2026 UTC: `pdb_structs=[]` in the primary record, 2,089 profile-wide IDs in `PS51442.aux`, 1,577 IDs shared with `P0DTD1`, and 1,575 of those covering at least 50% of 3264–3569. Two shared IDs fail that filter (`8H7K`, `9EZ6`). `6LU7` remains a valid example: UniProt maps chain A to 3264–3569, SIFTS maps the same UniProt interval to PDB residues 1–306, and the mmCIF contains 306 modeled residues on chain A. Counts depend on the release and will change.
 
@@ -32,7 +35,8 @@ See [ANALYSIS.md](ANALYSIS.md) for the evidence table, biological interpretation
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[test]"
+.\.venv\Scripts\python.exe -m pip install --require-hashes -r requirements.lock
+.\.venv\Scripts\python.exe -m pip install --no-deps -e .
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\mpro-atlas.exe --accession P0DTD1 --pdb 6LU7 --out results
 ```
